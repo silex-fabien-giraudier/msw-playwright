@@ -54,6 +54,7 @@ function App() {
         This is a demo application with MSW (Mock Service Worker) and Playwright
         testing.
       </p>
+      <p>MIAOU</p>
       {user && (
         <div
           style={{
