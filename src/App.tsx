@@ -54,8 +54,6 @@ function App() {
         This is a demo application with MSW (Mock Service Worker) and Playwright
         testing.
       </p>
-      
-      {/* REST API Demo */}
       {user && (
         <div
           style={{
@@ -65,44 +63,13 @@ function App() {
             borderRadius: "5px",
           }}
         >
-          <h2>User Information (REST API)</h2>
+          <h2>User Information</h2>
           <p>
             <strong>Name:</strong> {user.name}
           </p>
           <p>
             <strong>Role:</strong> {user.role}
           </p>
-        </div>
-      )}
-
-      {/* GraphQL Demo Toggle */}
-      <div style={{ margin: "20px 0" }}>
-        <button
-          data-testid="toggle-graphql-demo"
-          onClick={() => setShowGraphQLDemo(!showGraphQLDemo)}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
-        >
-          {showGraphQLDemo ? "Hide GraphQL Demo" : "Show GraphQL Demo"}
-        </button>
-      </div>
-
-      {/* GraphQL Demo */}
-      {showGraphQLDemo && (
-        <div style={{ 
-          marginTop: "20px", 
-          padding: "20px", 
-          backgroundColor: "#f8f9fa", 
-          borderRadius: "8px" 
-        }}>
-          <h2>GraphQL Demo</h2>
-          <UserProfile userId="1" />
         </div>
       )}
     </div>
