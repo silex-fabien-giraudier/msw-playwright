@@ -11,24 +11,16 @@ jobs:
 
      steps:
       - uses: actions/checkout@v3
-
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Cache Playwright binaries
+        with: { node-version: '20' }
+      - uses: actions/cache@v3
         id: playwright-cache
-        uses: actions/cache@v3
         with:
-          path: ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright/
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-
       - run: npm ci
-
       - run: npm run build
-
       - name: Install Playwright (only if not cached)
+        run: npx playwright install --with-deps chromium
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
-
       - run: npx playwright test
