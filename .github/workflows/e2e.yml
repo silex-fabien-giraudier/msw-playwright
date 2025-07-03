@@ -9,11 +9,26 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
 
-   steps:
+    steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+        with:
+          node-version: '20'
+
+      - name: Cache Playwright binaries
+        id: playwright-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+
       - run: npm ci
+
       - run: npm run build
-      - run: npx playwright install --with-deps
+
+      - name: Install Playwright (only if not cached)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
       - run: npx playwright test
