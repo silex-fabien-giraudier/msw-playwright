@@ -81,7 +81,7 @@ npx playwright install
 npm run dev
 ```
 
-L'application sera disponible sur `http://localhost:5173`
+L'application sera disponible sur `http://localhost:4173`
 
 ### Build de Production
 
