@@ -95,6 +95,7 @@ npm run preview
 
 ### Tests E2E
 
+#### Playwright
 ```bash
 # Exécuter les tests Playwright (headless)
 npm run test:e2e
@@ -105,6 +106,24 @@ npm run test:e2e:ui
 # Voir le dernier rapport de tests
 npx playwright show-report
 ```
+
+#### Cypress
+```bash
+# Exécuter les tests Cypress (headless)
+npm run cypress:run
+
+# Ouvrir l'interface Cypress
+npm run cypress:open
+```
+
+### Comparaison des Frameworks
+
+Ce projet inclut des tests identiques avec **Playwright** et **Cypress** pour comparer :
+- **Performance** : Playwright ~4,8s vs Cypress ~13,4s
+- **Syntaxe** : Playwright (async/await) vs Cypress (chaînes de commandes)
+- **Debugging** : Playwright (traces) vs Cypress (interface graphique)
+
+Voir `test-comparison.md` pour une comparaison détaillée.
 
 ## 🔧 Configuration
 

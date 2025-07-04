@@ -6,17 +6,22 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:both": "npm run test:e2e && npm run cypress:run"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "cypress": "^14.5.1",
     "msw": "^2.10.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "typescript": "^5.0.0",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "wait-on": "^8.0.3"
   },
   "msw": {
     "workerDirectory": "public"

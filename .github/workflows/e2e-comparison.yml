@@ -1,0 +1,121 @@
+name: E2E Tests Comparison (Playwright vs Cypress)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    name: Playwright Tests
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Playwright deps
+        id: playwright-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Install Playwright (only if not cached)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+  cypress:
+    runs-on: ubuntu-latest
+    name: Cypress Tests
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Cypress binary
+        id: cypress-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install Cypress (only if not cached)
+        if: steps.cypress-cache.outputs.cache-hit != 'true'
+        run: npx cypress install
+
+      - name: Start server and run Cypress tests
+        run: |
+          npm run preview &
+          npx wait-on http://localhost:4173
+          npm run cypress:run
+        env:
+          CYPRESS_baseUrl: http://localhost:4173
+
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+
+  comparison:
+    runs-on: ubuntu-latest
+    name: Test Results Summary
+    needs: [playwright, cypress]
+    if: always()
+
+    steps:
+      - name: Test Results Summary
+        run: |
+          echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Framework | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.playwright.result }}" = "success" ]; then
+            echo "| Playwright | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Playwright | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.cypress.result }}" = "success" ]; then
+            echo "| Cypress | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Cypress | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See the individual job logs for detailed results and performance metrics." >> $GITHUB_STEP_SUMMARY 
