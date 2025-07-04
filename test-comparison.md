@@ -106,7 +106,44 @@ describe('User Display', () => {
 - Exécution dans le navigateur (limitations)
 - Pas de support natif pour les tests parallèles
 
+## Scripts disponibles
+
+### Playwright
+```bash
+npm run test:e2e        # Tests headless
+npm run test:e2e:ui     # Interface graphique
+```
+
+### Cypress
+```bash
+npm run cypress:run     # Tests headless (nécessite serveur externe)
+npm run cypress:test    # Tests complets (build + serveur + tests)
+npm run cypress:open    # Interface interactive
+```
+
+### Comparaison
+```bash
+npm run test:both       # Exécute les deux frameworks
+```
+
+## Configuration MSW
+
+L'application utilise MSW avec une configuration intelligente :
+
+```typescript
+// MSW s'active automatiquement dans ces cas :
+if (import.meta.env.DEV ||                                           // Mode dev
+    (window as any).PLAYWRIGHT ||                                    // Flag Playwright
+    (window.location.hostname === 'localhost' && window.location.port === '4173')) // Serveur preview
+```
+
+## Workflows GitHub Actions
+
+- **`.github/workflows/e2e.yml`** : Tests Playwright
+- **`.github/workflows/cypress.yml`** : Tests Cypress
+
 ## Recommandations
 
 - **Utilisez Playwright** si vous avez besoin de tester sur plusieurs navigateurs ou si vous travaillez avec des API complexes
-- **Utilisez Cypress** si vous privilégiez la facilité d'utilisation et une interface de debugging intuitive 
+- **Utilisez Cypress** si vous privilégiez la facilité d'utilisation et une interface de debugging intuitive
+- **Utilisez `npm run test:both`** pour comparer les performances des deux frameworks 
