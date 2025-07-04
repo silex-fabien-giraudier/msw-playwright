@@ -1,4 +1,4 @@
-name: Cypress E2E Tests
+name: Cypress Tests
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  cypress:
+  e2e:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,41 +16,19 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Cache Cypress binary
-        id: cypress-cache
+      - name: Cache Playwright deps
+        id: playwright-cache
         uses: actions/cache@v3
         with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - run: npm run build
 
-      - name: Install Cypress (only if not cached)
-        if: steps.cypress-cache.outputs.cache-hit != 'true'
-        run: npx cypress install
+      - name: Install Playwright (only if not cached)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
 
-      - name: Start server and run Cypress tests
-        run: |
-          npm run preview &
-          npx wait-on http://localhost:4173
-          npm run cypress:run
-        env:
-          CYPRESS_baseUrl: http://localhost:4173
-
-      - name: Upload Cypress screenshots
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-
-      - name: Upload Cypress videos
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-videos
-          path: cypress/videos 
+      - run: npx playwright test
