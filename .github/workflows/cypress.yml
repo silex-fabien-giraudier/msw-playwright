@@ -1,4 +1,4 @@
-name: E2E Tests (Cypress)
+name: Cypress Tests
 
 on:
   pull_request:
@@ -16,22 +16,23 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache Cypress binary
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install dependencies
         run: npm ci
 
       - name: Build the app
         run: npm run build
 
-      - name: Start the server
+      - name: Start the app preview server
         run: npm run preview &
-      
-      - name: Wait for the server to be ready
+
+      - name: Wait for the server
         run: npx wait-on http://localhost:4173
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          start: false
-          wait-on: 'http://localhost:4173'
-          browser: chrome
-          headless: true
+        run: npx cypress run --browser chrome --headless
